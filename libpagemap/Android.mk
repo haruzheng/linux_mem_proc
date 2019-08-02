@@ -27,6 +27,8 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 
 include $(BUILD_SHARED_LIBRARY)
+
+
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libpagemap
