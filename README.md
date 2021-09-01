@@ -1,4 +1,7 @@
 # mem_proc
+## Source
+* https://blog.csdn.net/sunao2002002/article/details/53999098
+* https://www.twblogs.net/a/5cbf2b04bd9eee397113c09e
 ## How to cross compile for embeded linux?
 ```bash
 add the following in CMakeLists.txt:
@@ -7,6 +10,7 @@ SET(CMAKE_C_COMPILER "arm-linux-gnueabihf-gcc")
 ```
 
 ## VSS/RSS/PSS/USS 的介紹
+![](https://i.imgur.com/9hfPmMH.png)
 Android 有一個名爲 procrank (/system/xbin/procrank) 的工具，它從高到低的順序列出了 Linux Process 的內部記憶體使用情況。其報告中有四個不同的大小，分別 VSS、RSS、PSS 和 USS。
 一般來說內部記憶體占用大小有如下規律或關係：VSS >= RSS >= PSS >= USS
 
