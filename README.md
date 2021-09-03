@@ -2,6 +2,20 @@
 ## Source
 * https://blog.csdn.net/sunao2002002/article/details/53999098
 * https://www.twblogs.net/a/5cbf2b04bd9eee397113c09e
+
+## How to use
+### First method - Shell Script
+* `./build.sh` - Build current architecture binary.
+* `./build_cmake.sh` - Build current architecture binary.
+* `./build-arm.sh` - Build arm architecture binary using `arm-linux-gnueabi-`
+
+### Another method - Make tool
+* `make help` - Show help message.
+* `make all [CC=GCC_COMPILER] [DESTDIR=OUTPUT_PATH]` - Build default gcc arch binary.
+* `make arm [A32CC=ARM_GCC_COMPILER] [DESTDIR=OUTPUT_PATH]` - Build ARM aarch32 gcc binary .
+* `make arm32 [A32CC=ARM_GCC_COMPILER] [DESTDIR=OUTPUT_PATH]` - Build ARM aarch32 gcc binary.
+* `make arm64 [A64CC=ARM_GCC_COMPILER] [DESTDIR=OUTPUT_PATH]` - Build ARM aarch64 gcc binary.
+
 ## How to cross compile for embeded linux?
 ```bash
 add the following in CMakeLists.txt:

@@ -1,3 +1,6 @@
 output
-/build/
-/build-arm/
+build/
+build-arm/
+bin/
+*.o
+*.a
