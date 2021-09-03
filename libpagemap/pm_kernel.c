@@ -26,133 +26,133 @@
 #include <pagemap/pagemap.h>
 
 int pm_kernel_create(pm_kernel_t **ker_out) {
-    pm_kernel_t *ker;
-    int error;
+	pm_kernel_t *ker;
+	int error;
 
-    if (!ker_out)
-        return 1;
-    
-    ker = calloc(1, sizeof(*ker));
-    if (!ker)
-        return errno;
+	if (!ker_out)
+		return 1;
 
-    ker->kpagecount_fd = open("/proc/kpagecount", O_RDONLY);
-    if (ker->kpagecount_fd < 0) {
-        error = errno;
-        free(ker);
-        return error;
-    }
+	ker = calloc(1, sizeof(*ker));
+	if (!ker)
+		return errno;
 
-    ker->kpageflags_fd = open("/proc/kpageflags", O_RDONLY);
-    if (ker->kpageflags_fd < 0) {
-        error = errno;
-        close(ker->kpagecount_fd);
-        free(ker);
-        return error;
-    }
+	ker->kpagecount_fd = open("/proc/kpagecount", O_RDONLY);
+	if (ker->kpagecount_fd < 0) {
+		error = errno;
+		free(ker);
+		return error;
+	}
 
-    ker->pagesize = getpagesize();
+	ker->kpageflags_fd = open("/proc/kpageflags", O_RDONLY);
+	if (ker->kpageflags_fd < 0) {
+		error = errno;
+		close(ker->kpagecount_fd);
+		free(ker);
+		return error;
+	}
 
-    *ker_out = ker;
+	ker->pagesize = getpagesize();
 
-    return 0;
+	*ker_out = ker;
+
+	return 0;
 }
 
 #define INIT_PIDS 20
 int pm_kernel_pids(pm_kernel_t *ker, pid_t **pids_out, size_t *len) {
-    DIR *proc;
-    struct dirent *dir;
-    pid_t pid, *pids, *new_pids;
-    size_t pids_count, pids_size;
-    int error;
+	DIR *proc;
+	struct dirent *dir;
+	pid_t pid, *pids, *new_pids;
+	size_t pids_count, pids_size;
+	int error;
 
-    proc = opendir("/proc");
-    if (!proc)
-        return errno;
+	proc = opendir("/proc");
+	if (!proc)
+		return errno;
 
-    pids = malloc(INIT_PIDS * sizeof(pid_t));
-    if (!pids) {
-        closedir(proc);
-        return errno;
-    }
-    pids_count = 0; pids_size = INIT_PIDS;
+	pids = malloc(INIT_PIDS * sizeof(pid_t));
+	if (!pids) {
+		closedir(proc);
+		return errno;
+	}
+	pids_count = 0; pids_size = INIT_PIDS;
 
-    while ((dir = readdir(proc))) {
-        if (sscanf(dir->d_name, "%d", &pid) < 1)
-            continue;
+	while ((dir = readdir(proc))) {
+		if (sscanf(dir->d_name, "%d", &pid) < 1)
+			continue;
 
-        if (pids_count >= pids_size) {
-            new_pids = realloc(pids, 2 * pids_size * sizeof(pid_t));
-            if (!new_pids) {
-                error = errno;
-                free(pids);
-                closedir(proc);
-                return error;
-            }
-            pids = new_pids;
-            pids_size = 2 * pids_size;
-        }
+		if (pids_count >= pids_size) {
+			new_pids = realloc(pids, 2 * pids_size * sizeof(pid_t));
+			if (!new_pids) {
+				error = errno;
+				free(pids);
+				closedir(proc);
+				return error;
+			}
+			pids = new_pids;
+			pids_size = 2 * pids_size;
+		}
 
-        pids[pids_count] = pid;
+		pids[pids_count] = pid;
 
-        pids_count++;
-    }
+		pids_count++;
+	}
 
-    closedir(proc);
-    
-    new_pids = realloc(pids, pids_count * sizeof(pid_t));
-    if (!new_pids) {
-        error = errno;
-        free(pids);
-        return error;
-    }
+	closedir(proc);
 
-    *pids_out = new_pids;
-    *len = pids_count;
+	new_pids = realloc(pids, pids_count * sizeof(pid_t));
+	if (!new_pids) {
+		error = errno;
+		free(pids);
+		return error;
+	}
 
-    return 0;
+	*pids_out = new_pids;
+	*len = pids_count;
+
+	return 0;
 }
 
 int pm_kernel_count(pm_kernel_t *ker, uint64_t pfn, uint64_t *count_out) {
-    off64_t off;
+	off64_t off;
 
-    if (!ker || !count_out)
-        return -1;
+	if (!ker || !count_out)
+		return -1;
 
-    off = lseek64(ker->kpagecount_fd, pfn * sizeof(uint64_t), SEEK_SET);
-    if (off == (off_t)-1)
-        return errno;
-    if (read(ker->kpagecount_fd, count_out, sizeof(uint64_t)) <
-        (ssize_t)sizeof(uint64_t))
-        return errno;
+	off = lseek64(ker->kpagecount_fd, pfn * sizeof(uint64_t), SEEK_SET);
+	if (off == (off_t)-1)
+		return errno;
+	if (read(ker->kpagecount_fd, count_out, sizeof(uint64_t)) <
+		(ssize_t)sizeof(uint64_t))
+		return errno;
 
-    return 0;
+	return 0;
 }
 
 int pm_kernel_flags(pm_kernel_t *ker, uint64_t pfn, uint64_t *flags_out) {
-    off64_t off;
+	off64_t off;
 
-    if (!ker || !flags_out)
-        return -1;
+	if (!ker || !flags_out)
+		return -1;
 
-    off = lseek64(ker->kpageflags_fd, pfn * sizeof(uint64_t), SEEK_SET);
-    if (off == (off_t)-1)
-        return errno;
-    if (read(ker->kpageflags_fd, flags_out, sizeof(uint64_t)) <
-        (ssize_t)sizeof(uint64_t))
-        return errno;
+	off = lseek64(ker->kpageflags_fd, pfn * sizeof(uint64_t), SEEK_SET);
+	if (off == (off_t)-1)
+		return errno;
+	if (read(ker->kpageflags_fd, flags_out, sizeof(uint64_t)) <
+		(ssize_t)sizeof(uint64_t))
+		return errno;
 
-    return 0;
+	return 0;
 }
 
 int pm_kernel_destroy(pm_kernel_t *ker) {
-    if (!ker)
-        return -1;
+	if (!ker)
+		return -1;
 
-    close(ker->kpagecount_fd);
-    close(ker->kpageflags_fd);
+	close(ker->kpagecount_fd);
+	close(ker->kpageflags_fd);
 
-    free(ker);
+	free(ker);
 
-    return 0;
+	return 0;
 }
